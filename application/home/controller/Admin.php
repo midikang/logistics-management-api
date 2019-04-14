@@ -4,7 +4,7 @@ use think\Db;
 use think\facade\Request;
 use think\Validate;
 use think\Loader;
-class Admin
+class Admin extends \app\Home\controller\Base
 {
 	public function doLogin(){
 		$data = Request::post();
@@ -20,7 +20,11 @@ class Admin
        		if(MD5($data['password'])!=$adminInfo['password']){
        			return returnData('error',-1,'密码错误');
        		}else{
-       			return returnData($adminInfo,1,'处理成功');
+       			if($adminInfo['status']!=1){
+       				return returnData('error',-1,'您已被删除或禁用，请联系高级管理员');
+       			}else{
+       				return returnData($adminInfo,1,'处理成功');
+       			}
        		}
   	    }
 	}
@@ -28,6 +32,9 @@ class Admin
 
 	public function getAdminList(){
 		$data = Request::post();
+		if(count($data)==0){
+			return returnData('error',-1,'[参数错误]');
+		}
 		try {
 			$map['status'] = ['in',1,0];
 			$adminList =  Db::name('admin')->where($map)->failException(false)->select();

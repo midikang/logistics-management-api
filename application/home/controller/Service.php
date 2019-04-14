@@ -4,7 +4,7 @@
  * @Author: shiwan
  * @Date:   2019-03-15 14:10:48
  * @Last Modified by:   shiwan
- * @Last Modified time: 2019-03-24 20:38:06
+ * @Last Modified time: 2019-04-14 12:24:12
  */
 namespace app\home\controller;
 use think\Db;
@@ -70,9 +70,8 @@ class Service extends \app\Home\controller\Base
 		try {
 			$map['repair_id'] = $data['repair_id'];
 			$map2['service_id'] = $data['repair_id'];
-
 			$data = Db::name('service')->where($map)->failException(false)->find();
-			$data['processInfo'] = Db::name('process')->where($map2)->order('time','desc')->failException(false)->select();
+			$data['processInfo'] = Db::name('process')->where($map2)->order('id','desc')->failException(false)->select();
 		} catch (Exception $e) {
 			return returnData('error',-1,$e->getMessage());
 		}
@@ -118,6 +117,38 @@ class Service extends \app\Home\controller\Base
 				return returnData('error',-1,$e->getMessage());
 			}
 				$rst = Db::name('service')-> where($map) -> setField($servieUpdate);  //更新service进度
+		} catch (Exception $e) {
+			return returnData('error',-1,$e->getMessage());
+		}
+		return returnData('',1,'处理成功');
+	}
+
+	//完成维修
+	public function finishWork($service_id){
+		$data = Request::post();
+		$map['repair_id'] = $data['service_id'];
+		$step3 = setProcess('',5,'','',$data['worker_name'],'');
+		$step3['service_id'] = $data['service_id'];
+		$serviceInfo = Db::name('service')->where($map)->field('user_id,user_name,worker_id')->find();
+		$message = setMessage($serviceInfo['worker_id'],$data['worker_name'],$serviceInfo['user_id'],$serviceInfo['user_name']);
+		$servieUpdate['process'] = 5;  //进度
+		try {
+			$process3 = Db::name('process')->data($step3,true)->insert();  //审批进度
+			$sendMessage = Db::name('message')->data($message,true)->insert(); //发送消息
+			$rst = Db::name('service')-> where($map) -> setField($servieUpdate);  //更新service进度
+		} catch (Exception $e) {
+			return returnData('error',-1,$e->getMessage());
+		}
+		return returnData('',1,'处理成功');
+	}
+	// 评价操作
+	public function doRater(){
+		$data = Request::post();
+		$map['repair_id'] = $data['service_id'];
+		$servieUpdate['admin_rater'] = $data['admin_rater'];
+		$servieUpdate['worker_rater'] = $data['worker_rater'];
+		try {
+			$rst = Db::name('service')-> where($map) -> setField($servieUpdate);  
 		} catch (Exception $e) {
 			return returnData('error',-1,$e->getMessage());
 		}

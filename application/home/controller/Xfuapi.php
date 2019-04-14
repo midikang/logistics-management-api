@@ -8,7 +8,7 @@ class Xfuapi extends \app\Home\controller\Base
 	protected $schoolCode =12714;
 	protected $timestamp  ='';
 	protected $baseUrl    ='http://xyhq.xafy.edu.cn/hall/api/v2/hall/web';
-    public function getService(){
+    public function getServiceList(){
     	$this->timestamp=time();
 		$data = array(
 				"schoolCode" =>$this->schoolCode,

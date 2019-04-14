@@ -6,7 +6,7 @@ use think\Jump;
 class File extends \app\Home\controller\Base
 {
 	protected $schoolCode = 12714;
-	protected $domain_path = 'http://127.0.0.1/composerProject/logistics-management/uploads/';
+	protected $domain_path = 'http://127.0.0.1/composerProject/logistics-management-api/uploads/';
     public function uploadFile(){
 	    	// 获取表单上传文件 例如上传了001.jpg
 	    $file = request()->file('image');
